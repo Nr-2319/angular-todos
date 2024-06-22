@@ -116,6 +116,17 @@ body {
   border-top: 1px solid #e6e6e6;
 }
 
+/* custom css for hint */
+.hint{
+  float: right;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+.toggle {
+  cursor: pointer;
+}
+
 .toggle-all {
   width: 1px;
   height: 1px;
@@ -240,6 +251,7 @@ body {
   color: #cc9a9a;
   margin-bottom: 11px;
   transition: color 0.2s ease-out;
+  cursor: pointer;
 }
 
 .todo-list li .destroy:hover {

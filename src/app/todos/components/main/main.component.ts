@@ -29,6 +29,19 @@ export class MainComponent {
     return todos;
   });
 
+  // no Todo class
+  noTodosClass = computed(() => this.todosService.todosSig().length === 0);
+
+  // toogle part in code
+  isAllTodosSelected = computed(() =>
+    this.todosService.todosSig().every((todo) => todo.isCompleted)
+  );
+
+  toggleAllTodos(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.todosService.toggleAll(target.checked);
+  }
+
   setEditingId(editingId: string | null): void {
     this.editingId = editingId;
   }

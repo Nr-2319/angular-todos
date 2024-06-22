@@ -13,10 +13,7 @@ import { TodoComponent } from '../todo/todo.component';
 })
 export class MainComponent {
   todosService = inject(TodoService);
-
-  // editing ID to edit the todos
-  editingId : string | null = null;
-
+  editingId: string | null = null;
 
   // to filter those todos that will only render
   visibleTodos = computed(() => {
@@ -24,16 +21,13 @@ export class MainComponent {
     const filter = this.todosService.filterSig();
 
     if (filter === FilterEnum.active) {
-      return todos.filter((todos) => !todos.isCompleted);
+      return todos.filter((todo) => !todo.isCompleted);
     } else if (filter === FilterEnum.completed) {
-      return todos.filter((todos) => todos.isCompleted);
+      return todos.filter((todo) => todo.isCompleted);
     }
 
-    // when filter is all
     return todos;
   });
-
-  // set function for editingId
 
   setEditingId(editingId: string | null): void {
     this.editingId = editingId;

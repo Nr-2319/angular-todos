@@ -1,7 +1,14 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  inject,
+} from '@angular/core';
 import { TodoInterface } from '../../types/todo.interface';
 import { CommonModule } from '@angular/common';
-
+import { TodoService } from '../../service/todo.service';
 
 @Component({
   selector: 'app-todo',
@@ -15,6 +22,7 @@ export class TodoComponent implements OnInit {
   @Input({ required: true }) isEditing!: boolean;
   @Output() setEditingId: EventEmitter<string | null> = new EventEmitter();
 
+  todosService = inject(TodoService);
   editingText: string = '';
 
   // when in edit mode initialize the string to edit
@@ -30,7 +38,7 @@ export class TodoComponent implements OnInit {
 
   // another function to update the todoSignal
   changeTodo(): void {
-    // this.todosService.changeTodo(this.todo.id, this.editingText);
+    this.todosService.changeTodo(this.todo.id, this.editingText);
     this.setEditingId.emit(null);
   }
 

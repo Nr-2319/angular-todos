@@ -13,13 +13,13 @@ import {
 import { TodoInterface } from '../../types/todo.interface';
 import { CommonModule } from '@angular/common';
 import { TodoService } from '../../service/todo.service';
+import { TodoFirebaseService } from '../../service/todo-firebase.service';
 
 @Component({
   selector: 'app-todo',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './todo.component.html',
-  styleUrl: './todo.component.css',
 })
 export class TodoComponent implements OnInit, OnChanges {
   @Input({ required: true }) todo!: TodoInterface;
@@ -27,8 +27,9 @@ export class TodoComponent implements OnInit, OnChanges {
   @Output() setEditingId: EventEmitter<string | null> = new EventEmitter();
 
   @ViewChild('textInput') textInput?: ElementRef;
-  
+
   todosService = inject(TodoService);
+  todosFirebaseService = inject(TodoFirebaseService);
   editingText: string = '';
 
   // when in edit mode initialize the string to edit
@@ -52,7 +53,17 @@ export class TodoComponent implements OnInit, OnChanges {
 
   // another function to update the todoSignal
   changeTodo(): void {
-    this.todosService.changeTodo(this.todo.id, this.editingText);
+    const dataToUpdate = {
+      text: this.editingText,
+      isCompleted: this.todo.isCompleted,
+    };
+
+    this.todosFirebaseService
+      .updateTodo(this.todo.id, dataToUpdate)
+      .subscribe(() => {
+        this.todosService.changeTodo(this.todo.id, this.editingText);
+      });
+
     this.setEditingId.emit(null);
   }
 
@@ -61,10 +72,22 @@ export class TodoComponent implements OnInit, OnChanges {
   }
 
   removeTodo(): void {
-    this.todosService.removeTodo(this.todo.id);
+    // update backend -> get subscribe response to update frontend
+    this.todosFirebaseService.removeTodo(this.todo.id).subscribe(() => {
+      this.todosService.removeTodo(this.todo.id);
+    });
   }
 
   toggleTodo(): void {
-    this.todosService.toggleTodo(this.todo.id);
+    const dataToUpdate = {
+      text: this.todo.text,
+      isCompleted: !this.todo.isCompleted,
+    };
+
+    this.todosFirebaseService
+      .updateTodo(this.todo.id, dataToUpdate)
+      .subscribe(() => {
+        this.todosService.toggleTodo(this.todo.id);
+      });
   }
 }

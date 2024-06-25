@@ -3,16 +3,18 @@ import { TodoService } from '../../service/todo.service';
 import { CommonModule } from '@angular/common';
 import { FilterEnum } from '../../types/filter.enum';
 import { TodoComponent } from '../todo/todo.component';
+import { TodoFirebaseService } from '../../service/todo-firebase.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-main',
   standalone: true,
   imports: [CommonModule, TodoComponent],
   templateUrl: './main.component.html',
-  styleUrl: './main.component.css',
 })
 export class MainComponent {
   todosService = inject(TodoService);
+  todosFirebaseService = inject(TodoFirebaseService);
   editingId: string | null = null;
 
   // to filter those todos that will only render
@@ -39,7 +41,19 @@ export class MainComponent {
 
   toggleAllTodos(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.todosService.toggleAll(target.checked);
+
+    // array of all the firebase data
+    const request$ = this.todosService.todosSig().map((todo) => {
+      return this.todosFirebaseService.updateTodo(todo.id, {
+        text: todo.text,
+        isCompleted: target.checked,
+      });
+    });
+
+    // subscribe the request and check-uncheck
+    forkJoin(request$).subscribe(() => {
+      this.todosService.toggleAll(target.checked);
+    });
   }
 
   setEditingId(editingId: string | null): void {
